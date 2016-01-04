@@ -56,17 +56,29 @@
 <script>
 
   function ribbonTest1(setSmooth, prollBuffer, ribbonType, divID) {
+
+    // read work id from local storage
     var jrpid = getJrpid();
+
+    // display composer, id metadata
     displayWorkInfo("workinfo", jrpid);
+
+    // construct links to the json data files
     var prolllink     = "http://josquin.stanford.edu/cgi-bin/jrp?a=";
     var avgpitchlink  = prolllink;
     avgpitchlink += "avgpitch-json&id=" + jrpid;
     prolllink    += "proll-json&id="    + jrpid;
 
+    // query for the json
     queue()
     .defer(d3.json, avgpitchlink)
     .defer(d3.json, prolllink)
-    .await(function(error, file1, file2) { createRibbons(setSmooth, prollBuffer, ribbonType, divID, file1, file2); });
+    .await(function(error, file1, file2) {
+
+      // spin up the viz
+      createRibbons(setSmooth, prollBuffer, ribbonType, divID, file1, file2);
+
+    });
   }
 
   function createRibbons(setSmooth, prollBuffer, ribbonType, divID, ribbonData, prollData) {
@@ -80,6 +92,8 @@
     
     var svg = d3.select("#" + divID).select("svg");
     
+
+    // inject top-level <g>'s. proll?
     svg.append("g").attr("id", "axes");
     svg.append("g").attr("id", "proll");
     svg.append("g").attr("id", "ribbons");

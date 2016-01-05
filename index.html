@@ -6,7 +6,7 @@
 <script src="d3.v3.min.js"></script>
 <script src="colorbrewer.js"></script>
 <script src="queue.js"></script>
-<script src="/scripts/scripts-common.js"></script>
+<script src="scripts/scripts-common.js"></script>
 <script src="craig.js"></script>
 <style>
   body, html {
@@ -85,23 +85,23 @@
 
     d3.select("#" + divID).selectAll("svg")
     .remove();
-    
+
     d3.select("#" + divID)
     .append("svg")
     .append("defs");
-    
+
     var svg = d3.select("#" + divID).select("svg");
-    
+
 
     // inject top-level <g>'s. proll?
     svg.append("g").attr("id", "axes");
     svg.append("g").attr("id", "proll");
     svg.append("g").attr("id", "ribbons");
     svg.append("g").attr("id", "annotation");
-        
+
     vizHeight = 600;
     vizWidth = 500;
-    
+
     currentScale = 1;
 
     partColors = [
@@ -126,12 +126,12 @@
       colorbrewer.Oranges[3],
       colorbrewer.Greens[3]
     ]
-    
+
     partColors = partColors.splice(0,ribbonData.partnames.length - 1);
     partColors.push(colorbrewer.Greys[3]);
 
     smoothing = 2;
-    
+
     frames = ribbonData.framedata;
     parts = ribbonData.partnames;
     rolldata = prollData.partdata;
@@ -149,7 +149,7 @@
         }
       }
     }
-    
+
     indexExtent = d3.extent(frames, function(d) {return d.frameindex})
     xScale = d3.scale.linear().domain(indexExtent).range([0,vizWidth])
     scaledXScale = d3.scale.linear().domain(indexExtent).range([0,vizWidth])
@@ -197,7 +197,7 @@
     pRollVisualization();
     annotationBar();
     redraw();
-  
+
   d3.select("svg").call(ribbonZoom);
   d3.select("svg").on("mousemove",scoreOver).insert("rect", "g").attr("height", 10000).attr("width", 10000).attr("x", -5000).attr("y",-5000).attr("class","bg").style("pointer-events", "auto");
   window.onresize = function() {
@@ -217,7 +217,7 @@
     var partOffset = (vizHeight / parts.length) + 20;
       for (var x in parts) {
       partName = parts[x];
-      
+
       d3.select("#axes").select("g." + partName)
       .transition()
       .duration(tTime)
@@ -225,50 +225,50 @@
 
       d3.select("#ribbons").select("g." + partName)
       .transition()
-      .duration(tTime)      
+      .duration(tTime)
       .attr("transform", "translate(0," + (x * partOffset) + ")");
-      
+
       d3.select("#ribbons").select("g." + partName)
       .selectAll("path.pitchsdArea")
       .transition()
-      .duration(tTime)      
+      .duration(tTime)
       .style("fill", "none")
       .style("stroke", function() {return x == parts.length - 1 ? "gray" : partColors[x][1]})
       .style("stroke-width", function() {return x == 0 ? "4px" : "2px"})
       .style("fill-opacity", function() {return x == 0 ? .1 : .5})
     }
-    
+
     for (var x in rollparts) {
       partName = rollparts[x];
       d3.select("#ribbons").select("g.r" + partName)
       .transition()
-      .duration(tTime)      
+      .duration(tTime)
       .attr("transform", "translate(0," + ((x * partOffset)) + ")");
 
       d3.select("#ribbons").select("g.r" + partName)
       .selectAll("rect.proll")
       .transition()
-      .duration(tTime)      
+      .duration(tTime)
       .attr("x", function(d){ return scaledXScale(d.starttime[0] / 2)})
       .attr("y", function(d){ return pitchScale(d.pitch.b7) - 2})
       .attr("width", function(d){ return scaledXScale(d.duration[0] / 2)});
-      
+
     }
 
-    yAxis = d3.svg.axis().scale(pitchScale).orient("right").tickSize(vizWidth).tickSubdivide(false).tickFormat(staffAxisFormat);    
+    yAxis = d3.svg.axis().scale(pitchScale).orient("right").tickSize(vizWidth).tickSubdivide(false).tickFormat(staffAxisFormat);
     d3.select("#axes").selectAll("g.part").call(yAxis);
     d3.selectAll("g.tick").filter(function(d) {return d == 28}).style("stroke-dasharray", "4 4");
-    
+
         for (var x in parts) {
       var pitchExtent = d3.extent(frames, function(d) {return d.partdata[x].pitchmean[smoothing]})
-      var pitchsdExtent = d3.extent(frames, function(d) {return d.partdata[x].pitchsd[smoothing]})    
-      
+      var pitchsdExtent = d3.extent(frames, function(d) {return d.partdata[x].pitchsd[smoothing]})
+
       var pExtent = [pitchExtent[0] - pitchsdExtent[1],pitchExtent[1] + pitchsdExtent[1]]
 
 
       if (parts[x] != "full_score") {
         var pData = d3.select(".r" + parts[x]).selectAll("rect.proll").data();
-      
+
         pExtent = d3.extent(pData, function(d) {return d.pitch.b7});
       }
 
@@ -284,7 +284,7 @@
         }
 
   }
-  
+
   function adjustSmoothing(newSmooth) {
     smoothing = newSmooth;
     pitchScale = [];
@@ -298,17 +298,17 @@
     for (var x in parts) {
       var pitchExtent = d3.extent(frames, function(d) {return d.partdata[x].pitchmean[smoothing]})
       allPitch.push(pitchExtent);
-      var pitchsdExtent = d3.extent(frames, function(d) {return d.partdata[x].pitchsd[smoothing]})    
+      var pitchsdExtent = d3.extent(frames, function(d) {return d.partdata[x].pitchsd[smoothing]})
       allPitchSD.push(pitchsdExtent);
-      var attacksExtent = d3.extent(frames, function(d) {return d.partdata[x].attacks[smoothing]})    
+      var attacksExtent = d3.extent(frames, function(d) {return d.partdata[x].attacks[smoothing]})
       allAttacks.push(attacksExtent);
-      
+
       if (x != 0) {
-        var vAttacksExtent = d3.extent(frames, function(d) {return d.partdata[x].attacks[smoothing]})    
+        var vAttacksExtent = d3.extent(frames, function(d) {return d.partdata[x].attacks[smoothing]})
         voiceAttacks.push(vAttacksExtent);
-        
+
       }
-      
+
 
     }
     minPitchSD = d3.min(allPitchSD, function (d) {return d[0]})
@@ -319,7 +319,7 @@
     maxAttacks = d3.max(allAttacks, function (d) {return d[1]})
     minVAttacks = d3.min(voiceAttacks, function (d) {return d[0]})
     maxVAttacks = d3.max(voiceAttacks, function (d) {return d[1]})
-    
+
     pitchScale = d3.scale.linear().domain([18,maxPitch + maxPitchSD]).range([vizHeight / parts.length,0])
     attacksScaleArray = [];
 
@@ -339,14 +339,14 @@
     .x(function(d) { return scaledXScale(d.frameindex); })
     .y0(function(d) { return pitchScale(d.partdata[_part].pitchmean[smoothing] - d.partdata[_part].pitchsd[smoothing]) })
     .y1(function(d) { return pitchScale(d.partdata[_part].pitchmean[smoothing] + d.partdata[_part].pitchsd[smoothing]) });
-      
+
     }
 
     d3.select(this).attr("d", pitchsdArea(d));
-    
+
     d3.select("defs").select("#clip" + _part).select("path").attr("d", pitchsdArea(d));
   })
-  
+
     d3.selectAll("path.pitchLine")
   .each(function(d) {
     var _part = d3.select(this).attr("partnumber");
@@ -358,7 +358,7 @@
 
     d3.select(this).attr("d", pitchLine(d));
   })
-  
+
       for (var x in parts) {
     var voronoi = d3.geom.voronoi()
     .x(function(d) {return scaledXScale(d.frameindex)})
@@ -370,9 +370,9 @@
       })
 
       var pColor = partColors[x][1];
-      var bAttacksScale = d3.scale.linear().domain([minAttacks,maxAttacks]).range([partColors[x][0], partColors[x][2]]);        
+      var bAttacksScale = d3.scale.linear().domain([minAttacks,maxAttacks]).range([partColors[x][0], partColors[x][2]]);
       if (x != 0) {
-        bAttacksScale.domain([minVAttacks,maxVAttacks]);        
+        bAttacksScale.domain([minVAttacks,maxVAttacks]);
       }
 
       d3.select("#ribbons").select("g." + parts[x]).selectAll("path.voronoi")
@@ -382,7 +382,7 @@
         .attr("class", "voronoi")
         .attr("clip-path", "url(#clip" +x+")")
         .style("stroke-width", "1px");
-        
+
       d3.select("#ribbons").select("g." + parts[x]).selectAll("path.voronoi")
         .data(vData)
         .exit()
@@ -393,7 +393,7 @@
         .style("fill", function(d,i) {return bAttacksScale(d.data.attacks[smoothing])})
         .style("stroke", function(d,i) {return bAttacksScale(d.data.attacks[smoothing])})
 //        .on("mouseout",  vorOut)
-        
+
         function vorOver(d) {
 //          d3.select(this).style("fill", "red")
 //          d3.select("#hoverDetails").html("Start Frame: " + d.data.startframe[smoothing] + ", End Frame: " + d.data.endframe[smoothing] + ", Pitch (mean): " + d.data.pitchmean[smoothing] + ", Pitch (STD): " + d.data.pitchsd[smoothing] + ", Attacks: " + d.data.attacks[smoothing])
@@ -407,13 +407,13 @@
           d3.selectAll("path.voronoi").each(function(d) {
             var AS = d3.scale.linear().domain([minAttacks,maxAttacks]).range([partColors[x][0], partColors[x][2]]);
             d3.select(this).style("fill", function(d,i) {return AS(d.data.attacks[smoothing])})
-            
+
           })
         }
 
     }
-  
-  
+
+
   d3.select("#vizcontainer").append("button").on("click", combineRibbons).html("combine").style("left", "20px")
   d3.select("#vizcontainer").append("button").on("click", separateRibbons).html("separate").style("left", "80px")
 
@@ -424,29 +424,29 @@
 
   d3.selectAll("g.part").transition().duration(2000).attr("transform", function(d,i) {return i == 0 ? "translate(0,300)" : "translate(0,300)"})
   d3.selectAll("g.rollpart").transition().duration(2000).attr("transform", function(d,i) {return i == 0 ? "translate(0,300)" : "translate(0,300)"})
-  
+
   d3.selectAll("g.rollpart").each(function(d) {
     var _part = d3.select(this).attr("partnumber");
     d3.select(this).selectAll("rect").transition().duration(2000).style("fill", partColors[_part][1]).style("fill-opacity", .75).style("stroke", "black").style("stroke-opacity", .75)
   })
   }
-  
+
   function separateRibbons() {
   //Tie to redraw
   d3.selectAll("path.voronoi").style("display", "none");
   setTimeout(function() {d3.selectAll("path.voronoi").style("display", "block");},2010)
-  redraw(2000);    
+  redraw(2000);
   }
 
   }
-  
+
   function annotationBar() {
     d3.select("#annotation").append("line").attr("id", "annotationBarStart")
     .attr("x1", 50).attr("x2", 50).attr("y1", 0).attr("y2", 1000).style("stroke", "black").style("stroke-width", "2px")
     d3.select("#annotation").append("line").attr("id", "annotationBarEnd")
     .attr("x1", 50).attr("x2", 50).attr("y1", 0).attr("y2", 1000).style("stroke", "black").style("stroke-width", "2px")
   }
-  
+
   function pRollVisualization() {
 
     //The Actual Visualization
@@ -485,7 +485,7 @@ function highLow() {
       .style("stroke", "red")
       .style("stroke-width", "4px")
     }
-  
+
 }
 
 function zoomStart() {
@@ -499,13 +499,13 @@ function zoomEnd() {
     t = ribbonZoom.translate();
     d3.selectAll("svg > g").attr("transform", "translate("+t+")")
     d3.select("g#axes").attr("transform", "translate(0,"+t[1]+")")
-    
+
     if (currentScale != ribbonZoom.scale()) {
           currentScale = ribbonZoom.scale();
           redraw();
     }
   }
-  
+
   function scoreOver(d) {
 
           var m = d3.mouse(this);
@@ -515,11 +515,11 @@ function zoomEnd() {
 
           d3.select("#annotationBarStart").attr("x1", xx - (sP/2)).attr("x2", xx - (sP/2))
           d3.select("#annotationBarEnd").attr("x1", xx + (sP/2)).attr("x2", xx + (sP/2))
-          
+
   }
-  
+
   }
-  
+
   function staffAxisFormat(num) {
     var staffLabels =
     { "38": "F",
@@ -536,7 +536,7 @@ function zoomEnd() {
     }
     return staffLabels[num];
   }
-  
+
 
 </script>
   </footer>

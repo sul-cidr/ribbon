@@ -9,7 +9,7 @@ var cgiinit = -1;
 function getJrpid() {
 	var CgiParameters;
 	cgiinit++;
-	CgiParameters = getCgiParameters();
+	CgiParameters = GetCgiParameters();
    if (cgiinit > 0) {
 		return localStorage.RIBBONjrpid;
    }
@@ -78,7 +78,7 @@ function displayPreviousRepertoryRibbon() {
 	if ((localStorage.RIBBONjrpid == null) || (localStorage.RIBBONjrpid == "")) {
 		localStorage.RIBBONjrpid = "Jos2721";
 	}
-	initializeWorklist();
+	InitializeWorklist();
 	var pieces = localStorage.RIBBONjrpid.match(/^([A-Z][a-z][a-z])/);
 	if (pieces == null) {
 		return;
@@ -107,7 +107,7 @@ function displayPreviousRepertoryRibbon() {
 
 function displayNextRepertoryRibbon() {
 	var i;
-	initializeWorklist();
+	InitializeWorklist();
 	SECTIONS = [];
 	var pieces = localStorage.RIBBONjrpid.match(/^([A-Z][a-z][a-z])/);
 	var repertory = pieces[1];
@@ -133,7 +133,7 @@ function displayNextRepertoryRibbon() {
 //
 
 function displayNextWorkRibbon() {
-	initializeWorklistFlat();
+	InitializeWorklistFlat();
    SECTIONS = [];
 	var entry;
 	var nextone = 0;
@@ -174,7 +174,7 @@ function displayNextWorkRibbon() {
 //
 
 function displayPreviousWorkRibbon() {
-	initializeWorklistFlat();
+	InitializeWorklistFlat();
    SECTIONS = [];
 	var entry;
 	var lastentry;
@@ -209,7 +209,7 @@ function displayWorkInfo(tagid, jrpid) {
 	var infoelement = document.getElementById(tagid);
    infoelement.style.marginTop = "-8px";
 	if (!infoelement) { return; }
-   initializeWorklistFlat();
+   InitializeWorklistFlat();
 	var entry = WORKLISTjrpid[jrpid];
 	if (!entry) { return; }
 	var composer = entry.comshort;

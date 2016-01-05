@@ -71,8 +71,10 @@
 
     // query for the json
     queue()
-    .defer(d3.json, avgpitchlink)
-    .defer(d3.json, prolllink)
+    //.defer(d3.json, avgpitchlink)
+    .defer(d3.json, 'ribdata.json')
+    //.defer(d3.json, prolllink)
+    .defer(d3.json, 'proll.json')
     .await(function(error, file1, file2) {
 
       // spin up the viz
